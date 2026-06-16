@@ -261,73 +261,62 @@
     100% { opacity: 0; transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(0.2); }
   }
 </style>
+
 <div id="universe">
   <canvas id="network"></canvas>
+
   <div id="hud">
     <div id="hud-title">Sentient Bookmarks</div>
-    <div id="hud-status">NETWORK ACTIVE — <span id="node-count-display">0</span>
-    nodes alive</div>
+    <div id="hud-status">NETWORK ACTIVE — <span id="node-count-display">0</span> nodes alive</div>
   </div>
+
   <div id="add-panel">
-    <input id="url-input" type="text" placeholder="paste url or name..." />
-    <button id="add-btn"> + SPAWN</button>
+    <input id="url-input" type="text" placeholder="paste url or name…" />
+    <button id="add-btn">+ SPAWN</button>
   </div>
-  <div id="instructions">hover to awaken · click to visit · nodes grow with each visit </div>
+
+  <div id="instructions">hover to awaken · click to visit · nodes grow with each visit</div>
 </div>
+
 <div class="tooltip" id="tooltip">
   <div id="t-name"></div>
   <div class="t-url" id="t-url"></div>
   <div class="t-clicks" id="t-clicks"></div>
 </div>
+
 <script>
-  const BOOKMARKS = [
-    {
-      name: 'GitHub', url: 'https://github.com', emoji: '🐙', 
-      color: '#c9d1d9', glow:'#58a6ff' 
-    },
-    {
-      name: 'YouTube', url: 'https://youtube.com', emoji: '▶', color: '#ff4444', glow: '#ff6b6b'
-    },
-    {
-      name: 'Maps', url:'https://maps.google.com', emoji: '◉', color: '#34d399', glow:'#6ee7b7'
-    },
-    {
-      name: 'Figma', url:'https://figma.com', emoji: '✦', color: '#a78bfa', glow:'#c4bfd' 
-    },
-    {
-      name: 'Claude', url:'https://claude.ai', emoji: '◈', color:'#f59e0b', glow:'#fbbf24'
-    },
-    {
-      name: 'Reddit', url: 'https://reddit.com', emoji: '◎', color:'#f97316', glow:'#fb923c'
-    },
-    {
-      name: 'Twitter', url : 'https://twitter.com', emoji: '✸', color: '#38bdf8', glow: '#7dd3c'
-    },
-    {
-      name: 'Notion', url : 'https://notion.so', emoji : '▣', color: 'd1d5db', glow: '#f9fafb'
-    },
-  ];
-  const universe = document.getElementById('universe');
-  const canvas = document.getElementById('network');
-  const ctx = canvas.getContext('2d');
-  const tooltip = document.getElementById('tooltip');
-  const nodeCountDisplay = document.getElementById('network');
-  let nodes = [];
-  let mouseX = 340, mouseY = 290;
-  let animFrame;
-  let time = 0;
-  function resize(){
-    canvas.width = universe.offsetWidth;
-    canvas.height = universe.offsetHeight;
-  }
-  resize();
-  function randRange(a, b){
-    return a + Math.random() * (b - a);
-  }
-  function lerp(a, b, t){
-    return a + (b - a) * t;
-  }
-  function createNode(data, x, y, clicks = 0) {
+const BOOKMARKS = [
+  { name: 'GitHub', url: 'https://github.com', emoji: '🐙', color: '#c9d1d9', glow: '#58a6ff' },
+  { name: 'YouTube', url: 'https://youtube.com', emoji: '▶', color: '#ff4444', glow: '#ff6b6b' },
+  { name: 'Maps', url: 'https://maps.google.com', emoji: '◉', color: '#34d399', glow: '#6ee7b7' },
+  { name: 'Figma', url: 'https://figma.com', emoji: '✦', color: '#a78bfa', glow: '#c4b5fd' },
+  { name: 'Claude', url: 'https://claude.ai', emoji: '◈', color: '#f59e0b', glow: '#fbbf24' },
+  { name: 'Reddit', url: 'https://reddit.com', emoji: '◎', color: '#f97316', glow: '#fb923c' },
+  { name: 'Twitter', url: 'https://twitter.com', emoji: '✸', color: '#38bdf8', glow: '#7dd3fc' },
+  { name: 'Notion', url: 'https://notion.so', emoji: '▣', color: '#d1d5db', glow: '#f9fafb' },
+];
+
+const universe = document.getElementById('universe');
+const canvas = document.getElementById('network');
+const ctx = canvas.getContext('2d');
+const tooltip = document.getElementById('tooltip');
+const nodeCountDisplay = document.getElementById('node-count-display');
+
+let nodes = [];
+let mouseX = 340, mouseY = 290;
+let animFrame;
+let time = 0;
+
+function resize() {
+  canvas.width = universe.offsetWidth;
+  canvas.height = universe.offsetHeight;
+}
+resize();
+
+function randRange(a, b) { return a + Math.random() * (b - a); }
+function lerp(a, b, t) { return a + (b - a) * t; }
+
+function createNode(data, x, y, clicks = 0) {
   const el = document.createElement('div');
   el.className = 'bookmark-node';
   el.style.left = x + 'px';
@@ -344,85 +333,97 @@
     </div>
     <div class="node-label" style="color:${data.glow};">${data.name}</div>
   `;
+
   const node = {
     data,
     el,
     x, y,
     vx: randRange(-0.3, 0.3),
     vy: randRange(-0.3, 0.3),
-    phase: Math.random()* Math.PI * 2,
+    phase: Math.random() * Math.PI * 2,
     speed: randRange(0.6, 1.4),
     clicks,
     baseSize,
-    hovered:false,
+    hovered: false,
     singing: false,
-    singTimer : 0,
+    singTimer: 0,
   };
+
   el.addEventListener('mouseenter', (e) => {
-    node.hovered = true; 
+    node.hovered = true;
     node.singing = true;
     node.singTimer = 60;
     showTooltip(e, node);
     spawnMusicNotes(node);
   });
-  el.addEventListener('mouseleave', () =>{
-     node.hovered = false;
-    tooltip.classList.remove('show');
 
-  });
+  el.addEventListener('mouseleave', () => {
+     });
+
   el.addEventListener('mousemove', (e) => {
+    moveTooltip(e);
+  });
+
+  el.addEventListener('click', () => {
     node.clicks++;
     incrementNode(node);
     spawnRipple(node.x, node.y, node.data.glow);
     spawnParticles(node.x, node.y, node.data.glow);
     window.open(node.data.url, '_blank');
   });
+
   universe.appendChild(el);
   nodes.push(node);
   nodeCountDisplay.textContent = nodes.length;
   return node;
-
-  }
-  function incrementNode(node){
-    node.baseSize = 28 + Math.min(node.clicks * 4, 28);
-    const core = node.el.querySelector('.node-core');
-    const rings = node.el.querySelectorAll('.node-ring');
-    const countEl = node.el.querySelector('.node-count');
-    core.style.width = node.baseSize + 'px';
-    core.style.height = node.baseSize + 'px';
-    core.style.boxShadow = `0 0 ${10+node.clicks*3}px ${node.data.glow}55, inset 0 0 8px ${node.data.glow}33`;
-rings[0].style.width = (node.baseSize + 12) + 'px';
-rings[0].style.height = (node.baseSize + 12) + 'px';
-rings[1].style.width = (node.baseSize + 24) + 'px';
-rings[1].style.height = (node.baseSize + 24) + 'px';
-
-countEl.textContent = node.clicks;
-countEl.classList.add('visible');
-setTimeout(() => countEl.classList.remove('visible'),2000);  
 }
-function showTootip(e, node) {
+
+function incrementNode(node) {
+  node.baseSize = 28 + Math.min(node.clicks * 4, 28);
+  const core = node.el.querySelector('.node-core');
+  const rings = node.el.querySelectorAll('.node-ring');
+  const countEl = node.el.querySelector('.node-count');
+
+  core.style.width = node.baseSize + 'px';
+  core.style.height = node.baseSize + 'px';
+  core.style.boxShadow = `0 0 ${10+node.clicks*3}px ${node.data.glow}55, inset 0 0 8px ${node.data.glow}33`;
+
+  rings[0].style.width = (node.baseSize + 12) + 'px';
+  rings[0].style.height = (node.baseSize + 12) + 'px';
+  rings[1].style.width = (node.baseSize + 24) + 'px';
+  rings[1].style.height = (node.baseSize + 24) + 'px';
+
+  countEl.textContent = node.clicks;
+  countEl.classList.add('visible');
+  setTimeout(() => countEl.classList.remove('visible'), 2000);
+}
+
+function showTooltip(e, node) {
   document.getElementById('t-name').textContent = node.data.name;
   document.getElementById('t-url').textContent = node.data.url.replace('https://', '');
   document.getElementById('t-clicks').textContent = `visited ${node.clicks}× — vitality: ${'█'.repeat(Math.min(node.clicks, 8))}${'░'.repeat(Math.max(0, 8 - node.clicks))}`;
-tooltip.classList.add('show');
-moveTooltip(e);
+  tooltip.classList.add('show');
+  moveTooltip(e);
 }
+
 function moveTooltip(e) {
-  tooltip.style.left = (e.clientX + 14) +'px';
+  tooltip.style.left = (e.clientX + 14) + 'px';
   tooltip.style.top = (e.clientY - 10) + 'px';
 }
-function spawnRipple(x, y, color){
+
+function spawnRipple(x, y, color) {
   const r = document.createElement('div');
   r.className = 'ripple';
   r.style.left = x + 'px';
   r.style.top = y + 'px';
   r.style.border = `1px solid ${color}`;
-r.style.boxShadow = `0 0 8px ${color}`;
-universe.appendChild(r);
-setTimeout(() => r.remove(), 800);
+  r.style.boxShadow = `0 0 8px ${color}`;
+  universe.appendChild(r);
+  setTimeout(() => r.remove(), 800);
 }
-function spawnParticle(x, y, color){
-  for (let i = 0; i < 8; i++){
+
+function spawnParticles(x, y, color) {
+  for (let i = 0; i < 8; i++) {
     const p = document.createElement('div');
     p.className = 'particle';
     const angle = (i / 8) * Math.PI * 2;
@@ -433,12 +434,13 @@ function spawnParticle(x, y, color){
     p.style.height = randRange(2, 5) + 'px';
     p.style.background = color;
     p.style.boxShadow = `0 0 4px ${color}`;
-p.style.setProperty('--dx', Math.cos(angle) * dist + 'px');
-p.style.setProperty('--dy', Math.sin(angle)* dist + 'px');
-universe.appendChild(p);
-setTimeout(() => p.remove(), 1200);
+    p.style.setProperty('--dx', Math.cos(angle) * dist + 'px');
+    p.style.setProperty('--dy', Math.sin(angle) * dist + 'px');
+    universe.appendChild(p);
+    setTimeout(() => p.remove(), 1200);
   }
 }
+
 const noteChars = ['♩','♪','♫','♬','∿','~','·'];
 function spawnMusicNotes(node) {
   for (let i = 0; i < 3; i++) {
@@ -464,7 +466,224 @@ function spawnMusicNotes(node) {
 
 const noteStyle = document.createElement('style');
 noteStyle.textContent = `@keyframes noteFloat {
-0% {opacity}}`
+  0% { opacity:1; transform:translate(-50%,-50%) scale(1); }
+  100% { opacity:0; transform:translate(calc(-50% + ${randRange(-30,30)}px), -60px) scale(0.5); }
+}`;
+document.head.appendChild(noteStyle);
 
+function drawNetwork() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+  const W = canvas.width;
+  const H = canvas.height;
+
+  for (let i = 0; i < nodes.length; i++) {
+    for (let j = i + 1; j < nodes.length; j++) {
+      const a = nodes[i];
+      const b = nodes[j];
+      const dx = b.x - a.x;
+      const dy = b.y - a.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      const maxDist = 240;
+
+      if (dist < maxDist) {
+        const strength = 1 - dist / maxDist;
+        const hovered = a.hovered || b.hovered;
+        const alpha = hovered ? strength * 0.7 : strength * 0.18;
+        const lineWidth = hovered ? strength * 1.5 : strength * 0.5;
+
+        const midX = (a.x + b.x) / 2;
+        const midY = (a.y + b.y) / 2 - 20 * strength;
+
+        ctx.beginPath();
+        ctx.moveTo(a.x, a.y);
+        ctx.quadraticCurveTo(midX, midY, b.x, b.y);
+
+        const colorA = hovered ? (a.hovered ? a.data.glow : b.data.glow) : '#4af';
+        const grad = ctx.createLinearGradient(a.x, a.y, b.x, b.y);
+        grad.addColorStop(0, hexAlpha(a.data.glow, alpha));
+        grad.addColorStop(1, hexAlpha(b.data.glow, alpha));
+
+        ctx.strokeStyle = grad;
+        ctx.lineWidth = lineWidth;
+        ctx.stroke();
+
+        if (hovered && strength > 0.4) {
+          const t = (time * 0.02) % 1;
+          const px = bezierPoint(a.x, midX, b.x, t);
+          const py = bezierPoint(a.y, midY, b.y, t);
+          ctx.beginPath();
+          ctx.arc(px, py, 2, 0, Math.PI * 2);
+          ctx.fillStyle = hexAlpha(colorA, 0.9);
+          ctx.fill();
+        }
+      }
+    }
+  }
+
+  const mouseMaxDist = 160;
+  nodes.forEach(node => {
+    const dx = mouseX - node.x;
+    const dy = mouseY - node.y;
+    const dist = Math.sqrt(dx*dx + dy*dy);
+    if (dist < mouseMaxDist) {
+      const alpha = (1 - dist/mouseMaxDist) * 0.12;
+      ctx.beginPath();
+      ctx.moveTo(node.x, node.y);
+      ctx.lineTo(mouseX, mouseY);
+      ctx.strokeStyle = hexAlpha(node.data.glow, alpha);
+      ctx.lineWidth = 0.5;
+      ctx.stroke();
+    }
+  });
+}
+
+function bezierPoint(p0, p1, p2, t) {
+  return (1-t)*(1-t)*p0 + 2*(1-t)*t*p1 + t*t*p2;
+}
+
+function hexAlpha(hex, alpha) {
+  const r = parseInt(hex.slice(1,3),16);
+  const g = parseInt(hex.slice(3,5),16);
+  const b = parseInt(hex.slice(5,7),16);
+  return `rgba(${r},${g},${b},${alpha})`;
+}
+
+function updateNodes() {
+  const W = universe.offsetWidth;
+  const H = universe.offsetHeight;
+  const margin = 60;
+
+  nodes.forEach(node => {
+    const bobX = Math.sin(time * 0.008 * node.speed + node.phase) * 1.2;
+    const bobY = Math.cos(time * 0.006 * node.speed + node.phase * 1.3) * 1.0;
+
+    if (!node.hovered) {
+      node.x += node.vx + bobX * 0.3;
+      node.y += node.vy + bobY * 0.3;
+
+      node.vx *= 0.98;
+      node.vy *= 0.98;
+
+      if (node.x < margin) { node.vx += 0.08; }
+      if (node.x > W - margin) { node.vx -= 0.08; }
+      if (node.y < margin) { node.vy += 0.08; }
+      if (node.y > H - margin) { node.vy -= 0.08; }
+
+      node.x = Math.max(margin, Math.min(W - margin, node.x));
+      node.y = Math.max(margin, Math.min(H - margin, node.y));
+    }
+
+    nodes.forEach(other => {
+      if (other === node) return;
+      const dx = node.x - other.x;
+      const dy = node.y - other.y;
+      const dist = Math.sqrt(dx*dx+dy*dy);
+      const minDist = 80;
+      if (dist < minDist && dist > 0) {
+        const force = (minDist - dist) / minDist * 0.05;
+        node.vx += (dx/dist) * force;
+        node.vy += (dy/dist) * force;
+      }
+    });
+
+    const pulseMult = node.hovered ? 1.1 : 1 + Math.sin(time * 0.05 * node.speed + node.phase) * 0.04;
+    const glowIntensity = node.hovered ? 20 + node.clicks * 4 : 8 + node.clicks * 2;
+    const core = node.el.querySelector('.node-core');
+    if (core && !node.hovered) {
+      core.style.boxShadow = `0 0 ${glowIntensity}px ${node.data.glow}${node.clicks > 0 ? '66' : '33'}, inset 0 0 8px ${node.data.glow}22`;
+    }
+
+    node.el.style.left = node.x + 'px';
+    node.el.style.top = node.y + 'px';
+
+    if (node.singTimer > 0) {
+      node.singTimer--;
+      if (node.singTimer <= 0) node.singing = false;
+    }
+  });
+}
+
+function loop() {
+  time++;
+  updateNodes();
+  drawNetwork();
+  animFrame = requestAnimationFrame(loop);
+}
+
+universe.addEventListener('mousemove', (e) => {
+  const rect = universe.getBoundingClientRect();
+  mouseX = e.clientX - rect.left;
+  mouseY = e.clientY - rect.top;
+});
+
+universe.addEventListener('mouseleave', () => {
+  mouseX = -1000;
+  mouseY = -1000;
+});
+
+const W = () => universe.offsetWidth;
+const H = () => universe.offsetHeight;
+
+function placeNode(i, total) {
+  const cols = Math.ceil(Math.sqrt(total));
+  const rows = Math.ceil(total / cols);
+  const col = i % cols;
+  const row = Math.floor(i / cols);
+  const marginX = 80, marginY = 80;
+  const spacingX = (W() - marginX * 2) / Math.max(cols - 1, 1);
+  const spacingY = (H() - marginY * 2) / Math.max(rows - 1, 1);
+  return {
+    x: marginX + col * spacingX + randRange(-30, 30),
+    y: marginY + row * spacingY + randRange(-25, 25),
+  };
+}
+
+BOOKMARKS.forEach((bm, i) => {
+  const pos = placeNode(i, BOOKMARKS.length);
+  createNode(bm, pos.x, pos.y);
+});
+
+document.getElementById('add-btn').addEventListener('click', () => {
+  const raw = document.getElementById('url-input').value.trim();
+  if (!raw) return;
+
+  let url = raw;
+  let name = raw;
+  if (!raw.startsWith('http')) {
+    url = 'https://' + raw;
+    name = raw.replace(/^www\./,'').split('.')[0];
+  } else {
+    name = raw.replace('https://','').replace('http://','').replace(/^www\./,'').split('/')[0].split('.')[0];
+  }
+  name = name.charAt(0).toUpperCase() + name.slice(1);
+
+  const colors = [
+    { color: '#818cf8', glow: '#a5b4fc' },
+    { color: '#34d399', glow: '#6ee7b7' },
+    { color: '#fb7185', glow: '#fda4af' },
+    { color: '#fbbf24', glow: '#fcd34d' },
+    { color: '#38bdf8', glow: '#7dd3fc' },
+  ];
+  const emojis = ['◉','✦','◈','✸','▣','◎','∴','⊕'];
+  const c = colors[no2s.length % colors.length];
+  const e = emojis[nodes.length % emojis.length];
+
+  const margin = 80;
+  const x = randRange(margin, W() - margin);
+  const y = randRange(margin, H() - margin);
+
+  const bm = { name, url, emoji: e, color: c.color, glow: c.glow };
+  const node = createNode(bm, x, y);
+  spawnRipple(x, y, c.glow);
+  document.getElementById('url-input').value = '';
+});
+
+document.getElementById('url-input').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') document.getElementById('add-btn').click();
+});
+
+window.addEventListener('resize', resize);
+
+loop();
 </script>
