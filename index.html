@@ -358,7 +358,9 @@ function createNode(data, x, y, clicks = 0) {
   });
 
   el.addEventListener('mouseleave', () => {
-     });
+    node.hovered = false;
+    tooltip.classList.remove('show');
+  });
 
   el.addEventListener('mousemove', (e) => {
     moveTooltip(e);
@@ -666,7 +668,7 @@ document.getElementById('add-btn').addEventListener('click', () => {
     { color: '#38bdf8', glow: '#7dd3fc' },
   ];
   const emojis = ['◉','✦','◈','✸','▣','◎','∴','⊕'];
-  const c = colors[nos.length % colors.length];
+  const c = colors[nodes.length % colors.length];
   const e = emojis[nodes.length % emojis.length];
 
   const margin = 80;
