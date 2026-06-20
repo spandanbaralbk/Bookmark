@@ -3,3 +3,4 @@ this is a small project mostly using javascript and css you can add tabs by past
 Javascript used
 and css
 you can add anylink and website you want
+THis is quite simple but contains a lot of js and css 
